@@ -1,13 +1,14 @@
 
 //window.onload = function() {sudokuMain()};
 
-function SudokuMain(solution, clues) {
+function SudokuMain(clues) {
 	
 	var svgns = "http://www.w3.org/2000/svg";
 	var cells;
 	var selectedCell = -1;
 	
-	createSudokuBoard(solution, clues);
+	console.log(clues);
+	createSudokuBoard(clues);
 	setInterval(blinkCursor, 1000/30);
 
 	document.onkeydown = function(event) {
@@ -31,10 +32,13 @@ function SudokuMain(solution, clues) {
 	function Cell(index) {
 		this.index = index;
 		this.value = 0;
-		this.isSelected = false;
 		this.isClue = false;
 		this.isLocked = false;
 		this.notes = [];
+		this.select = function() {
+			if (this.isClue || this.isLocked) return;
+			selectedCell = this.index;
+		}
 		this.getColor = function() {
 			if(this.isClue) return "#bbb";
 			else if(this.isLocked) return "#ddd";
@@ -51,20 +55,16 @@ function SudokuMain(solution, clues) {
 		}
 	}
 
-	function createSudokuBoard(solution, clues) {
-		cells = createCells(solution, clues);
+	function createSudokuBoard(clues) {
+		cells = createCells(clues);
 		
-		function createCells(solution, clues) {
+		function createCells(clues) {
 			var c = new Array();
 			for(var i = 0; i < 81; i++) {
 				var cell = new Cell(i);
+				cell.value = clues[i];
+				if (cell.value != 0) cell.isClue = true;
 				c.push(cell);
-			}
-			for(i in clues) {
-				var index = clues[i];
-				var value = solution[index];
-				c[index].value = value;
-				c[index].isClue = true;
 			}
 			return c;
 		}
@@ -93,9 +93,7 @@ function SudokuMain(solution, clues) {
 				rec.onmousedown  = function(event) {
 					redrawBoard();
 					var i = parseInt(event.target.getAttribute("id"));
-					selectedCell = i;
-					cells[i].isSelected = true;
-					event.target.setAttribute("fill", cells[i].getColor());
+					cells[i].select();
 				}
 				rec.onmouseover = function(event) {
 					event.target.setAttribute("fill", "orange");
