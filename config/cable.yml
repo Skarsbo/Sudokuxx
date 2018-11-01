@@ -7,4 +7,4 @@ test:
 production:
   adapter: redis
   url: redis://localhost:6379/1
-  channel_prefix: Sudoku_v0_2_production
+  channel_prefix: Sudokuxx_production
